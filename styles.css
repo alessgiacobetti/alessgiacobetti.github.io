@@ -1,0 +1,41 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #fff;
+    color: #000;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    max-width: 800px;
+    margin: 50px auto;
+    text-align: center;
+}
+
+a {
+    display: block;
+    text-decoration: none;
+    color: #000;
+    font-size: 18px; /* Adjusted font size */
+    margin-bottom: 20px; /* Adjusted margin between links */
+}
+
+a:hover {
+    color: #ddd; /* Light gray color on hover */
+}
+
+span {
+    display: inline-block;
+    opacity: 0;
+}
+
+@keyframes fall {
+    from {
+        transform: translateY(-100px); /* Start position: above the screen */
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0); /* End position: original position */
+        opacity: 1;
+    }
+}
