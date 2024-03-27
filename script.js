@@ -32,7 +32,7 @@ document.addEventListener("DOMContentLoaded", function() {
         // Delay appearance of each link
         setTimeout(() => {
             link.classList.add('visible');
-        }, (index + 2) * 500); // Start delay from the second link
+        }, (index + 3) * 500); // Start delay from the second link
     });
 
     // Add event listener to handle click events on email links
