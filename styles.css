@@ -1,41 +1,52 @@
 body {
-    font-family: Arial, sans-serif;
+    font-family: Consolas, Monaco, 'Courier New', Courier, monospace;
     background-color: #fff;
     color: #000;
     margin: 0;
     padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; /* Center vertically */
 }
 
 .container {
     max-width: 800px;
-    margin: 50px auto;
     text-align: center;
+}
+
+.heading {
+    opacity: 0; /* Initially hidden */
+    margin-bottom: 20px; /* Add more space between intro text and links */
+}
+
+.description {
+    opacity: 0; /* Initially hidden */
+    margin-bottom: 50px; /* Add more space between intro text and links */
+}
+
+h1, p {
+    font-size: 18px;
+    margin-bottom: 20px;
 }
 
 a {
     display: block;
     text-decoration: none;
     color: #000;
-    font-size: 18px; /* Adjusted font size */
-    margin-bottom: 20px; /* Adjusted margin between links */
+    font-size: 18px;
+    margin-bottom: 20px;
+    opacity: 0; /* Initially hidden */
+}
+
+a.visible, .heading.visible {
+    opacity: 1; /* Make visible */
+}
+
+a.visible, .description.visible {
+    opacity: 1; /* Make visible */
 }
 
 a:hover {
-    color: #ddd; /* Light gray color on hover */
-}
-
-span {
-    display: inline-block;
-    opacity: 0;
-}
-
-@keyframes fall {
-    from {
-        transform: translateY(-100px); /* Start position: above the screen */
-        opacity: 0;
-    }
-    to {
-        transform: translateY(0); /* End position: original position */
-        opacity: 1;
-    }
+    text-decoration: underline; /* Underline on hover */
 }
