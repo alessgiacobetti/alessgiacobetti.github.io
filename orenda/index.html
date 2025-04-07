@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Orenda</title>
+<link rel="icon" href="orenda.ico" type="image/x-icon">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+html {
+    scroll-behavior: smooth; /* Enable smooth scrolling globally */
+}
+
+:root {
+    --initial-fade-in-duration: 1.5s;
+    --fade-duration: 2s;
+    --question-fade-in-duration: 2.2s;
+    --card-appear-duration: 1.2s;
+    --card-flip-duration: 1.5s;
+    --float-duration: 4s;
+}
+
+body {
+  margin:0; padding:0; background:#ecd5f0;
+  font-family:'Press Start 2P', monospace; color:#333;
+  text-align:center; overflow-x: hidden;
+  display: flex; flex-direction: column; justify-content: center;
+  align-items: center; min-height: 100vh;
+}
+
+#portrait {
+  width: 300px; margin: 0 auto 10px; display:block;
+  animation: float var(--float-duration) ease-in-out infinite;
+  will-change: opacity, transform;
+  opacity: 0; visibility: hidden;
+  transition: opacity var(--initial-fade-in-duration) ease-in;
+}
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-15px); }
+}
+
+#portrait.is-fading-out {
+    animation:
+        float var(--float-duration) ease-in-out infinite,
+        fadeOut var(--fade-duration) ease-out forwards;
+    pointer-events: none;
+}
+
+#promptline {
+  margin: 20px auto 0; width:100%; z-index: 10;
+  will-change: opacity;
+  opacity: 0; visibility: hidden;
+  transition: opacity var(--initial-fade-in-duration) ease-in;
+}
+
+#userQuestion {
+  background:none; border:none; outline:none;
+  font-family:'Press Start 2P', monospace; font-size: 14px;
+  text-align:center; width:98%; max-width:98%;
+  color:#4a4a4a; caret-color:#4a4a4a;
+  display: block; margin-left: auto; margin-right: auto;
+  padding: 8px 0;
+}
+#userQuestion:disabled { opacity: 0.5; cursor: not-allowed; }
+
+#displayedQuestion {
+    font-size: 18px; font-weight: bold; color: #333;
+    margin: 50px auto 30px; padding: 10px;
+    text-align: center; opacity: 0; display: none;
+    transition: opacity var(--question-fade-in-duration) ease-in;
+    max-width: 85%; word-wrap: break-word; line-height: 1.5;
+    will-change: opacity;
+}
+
+@keyframes fadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
+
+.fade-out-prompt {
+    animation: fadeOut var(--fade-duration) ease-out forwards;
+    pointer-events: none;
+}
+
+#cards {
+  margin: 20px auto; padding-top: 10px; display:flex;
+  justify-content:center; gap:80px; flex-wrap:wrap; width: 100%;
+}
+
+/* Card Styles */
+.card-col{display:flex;flex-direction:column;align-items:center;width:220px;opacity:0;transform:translateY(60px);animation:none}.card-appear{animation:appear var(--card-appear-duration) ease forwards}@keyframes appear{0%{opacity:0;transform:translateY(60px)}100%{opacity:1;transform:translateY(0)}}.card{width:150px;height:263px;perspective:800px;margin:0 auto}.card-inner{width:100%;height:100%;transition:transform var(--card-flip-duration) ease-in-out;transform-style:preserve-3d;position:relative}.card.flipped .card-inner{transform:rotateY(180deg)}.card-front,.card-back{position:absolute;width:100%;height:100%;background-size:cover;border:1px solid #444;border-radius:4px;backface-visibility:hidden}.card-front{transform:rotateY(180deg)}
+.card-info { margin-top:8px; font-size:8px; line-height:1.4em; padding:4px; max-width:220px; word-wrap:break-word; color: #4a4a4a; }
+#finalReading { max-width:90%; margin:30px auto; font-size:16px; line-height:1.4em; padding:4px; font-weight:700; color: #333; }
+</style>
+</head><body>
+
+<img src="orenda.jpg" id="portrait">
+<div id="promptline">
+<input id="userQuestion" placeholder="Type your question & press ENTER"
+onkeydown="if(event.key==='Enter'){event.preventDefault(); divine(); }">
+</div>
+<div id="displayedQuestion"></div>
+<div id="cards"></div>
+<div id="finalReading"></div>
+
+<script>
+// Globals
+let isAnimating = false; // Removed apiKey global variable
+
+// DOM Elements
+const portraitEl = document.getElementById('portrait');
+const promptlineEl = document.getElementById('promptline');
+const inputEl = document.getElementById('userQuestion');
+const displayedQuestionEl = document.getElementById('displayedQuestion');
+const cardsDiv = document.getElementById('cards');
+const finalReadingDiv = document.getElementById('finalReading');
+
+// Utility Functions
+const cardFilenames = ["00-TheFool.png","01-TheMagician.png","02-TheHighPriestess.png","03-TheEmpress.png","04-TheEmperor.png","05-TheHierophant.png","06-TheLovers.png","07-TheChariot.png","08-Strength.png","09-TheHermit.png","10-WheelOfFortune.png","11-Justice.png","12-TheHangedMan.png","13-Death.png","14-Temperance.png","15-TheDevil.png","16-TheTower.png","17-TheStar.png","18-TheMoon.png","19-TheSun.png","20-Judgement.png","21-TheWorld.png","Cups01.png","Cups02.png","Cups03.png","Cups04.png","Cups05.png","Cups06.png","Cups07.png","Cups08.png","Cups09.png","Cups10.png","Cups11.png","Cups12.png","Cups13.png","Cups14.png","Pentacles01.png","Pentacles02.png","Pentacles03.png","Pentacles04.png","Pentacles05.png","Pentacles06.png","Pentacles07.png","Pentacles08.png","Pentacles09.png","Pentacles10.png","Pentacles11.png","Pentacles12.png","Pentacles13.png","Pentacles14.png","Swords01.png","Swords02.png","Swords03.png","Swords04.png","Swords05.png","Swords06.png","Swords07.png","Swords08.png","Swords09.png","Swords10.png","Swords11.png","Swords12.png","Swords13.png","Swords14.png","Wands01.png","Wands02.png","Wands03.png","Wands04.png","Wands05.png","Wands06.png","Wands07.png","Wands08.png","Wands09.png","Wands10.png","Wands11.png","Wands12.png","Wands13.png","Wands14.png"];
+function cleanQuotes(text) { return text.trim().replace(/^["']|["']$/g, '').trim(); }
+async function typeText(text, element, delay = 20) { const cleanedText=cleanQuotes(text);element.textContent='';for(const ch of cleanedText){element.textContent+=ch;await new Promise(r=>setTimeout(r,delay));}}
+
+// Initial Setup - Removed API Key prompt and check
+document.addEventListener("DOMContentLoaded", () => {
+    const img = new Image(); img.src = 'cards/CardBacks.png'; // Preload card back
+    requestAnimationFrame(() => {
+        const initialFadeDuration = getComputedStyle(document.documentElement).getPropertyValue('--initial-fade-in-duration') || '1.5s';
+        portraitEl.style.transition = `opacity ${initialFadeDuration} ease-in`;
+        promptlineEl.style.transition = `opacity ${initialFadeDuration} ease-in`;
+        portraitEl.style.visibility = 'visible';
+        promptlineEl.style.visibility = 'visible';
+        requestAnimationFrame(() => {
+            portraitEl.style.opacity = '1';
+            promptlineEl.style.opacity = '1';
+            console.log("Initial elements fade-in triggered.");
+            setTimeout(() => {
+                portraitEl.style.transition = '';
+                promptlineEl.style.transition = '';
+             }, parseFloat(initialFadeDuration) * 1000 + 50);
+        });
+    });
+});
+
+
+// Main Divination Function - Removed API Key check
+async function divine() {
+  if (isAnimating) return; // Removed '!apiKey' check
+  let q = inputEl.value.trim();
+  if (!q) { alert('Please enter your question.'); return; }
+
+  console.log("Starting divination...");
+  isAnimating = true; inputEl.disabled = true;
+
+  const fadeDurationString = getComputedStyle(document.documentElement).getPropertyValue('--fade-duration').trim() || '2s';
+  const animDuration = parseFloat(fadeDurationString) * 1000 || 2000;
+
+  // 1. Reset State
+  console.log("Resetting visual state...");
+  cardsDiv.innerHTML = ''; finalReadingDiv.innerHTML = '';
+  portraitEl.classList.remove('is-fading-out'); promptlineEl.classList.remove('fade-out-prompt');
+  portraitEl.style.opacity = '1'; promptlineEl.style.opacity = '1';
+  portraitEl.style.transition = 'none'; promptlineEl.style.transition = 'none';
+  displayedQuestionEl.textContent = ''; displayedQuestionEl.style.display = 'none'; displayedQuestionEl.style.opacity = '0';
+  document.body.style.display = 'flex'; document.body.style.flexDirection = 'column'; document.body.style.justifyContent = 'center'; document.body.style.alignItems = 'center'; document.body.style.minHeight = '100vh';
+  void portraitEl.offsetWidth;
+
+  // 2. Start Fade Out Animations
+  console.log("Starting CSS fade out animations...");
+  portraitEl.classList.add('is-fading-out'); promptlineEl.classList.add('fade-out-prompt');
+
+  // 3. Wait for Fade Out
+  console.log("Waiting for fade out duration...");
+  await new Promise(resolve => setTimeout(resolve, animDuration + 100));
+  console.log("Fade out duration elapsed.");
+
+  // 4. Post-Fade Out Adjustments
+  console.log("Removing body centering styles and hiding faded elements...");
+  document.body.style.display = ''; document.body.style.flexDirection = ''; document.body.style.justifyContent = ''; document.body.style.alignItems = ''; document.body.style.minHeight = '';
+  portraitEl.style.display = 'none'; promptlineEl.style.display = 'none';
+  portraitEl.classList.remove('is-fading-out'); promptlineEl.classList.remove('fade-out-prompt');
+  const initialFadeInDuration = getComputedStyle(document.documentElement).getPropertyValue('--initial-fade-in-duration') || '1.5s';
+  portraitEl.style.transition = `opacity ${initialFadeInDuration} ease-in`;
+  promptlineEl.style.transition = `opacity ${initialFadeInDuration} ease-in`;
+
+  // 5. Display the Question Text
+  console.log("Displaying question...");
+  displayedQuestionEl.textContent = q; displayedQuestionEl.style.display = 'block';
+  await new Promise(r => setTimeout(r, 50)); // Wait briefly for layout
+  displayedQuestionEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  console.log("Scrolling to question.");
+  requestAnimationFrame(() => {
+      setTimeout(() => {
+          displayedQuestionEl.style.opacity = '1';
+          console.log("Question fade-in triggered.");
+      }, 200);
+  });
+
+  // 6. Display Cards and Interpretations
+  console.log("Generating cards...");
+  const chosen = [...cardFilenames].sort(()=>Math.random()-0.5).slice(0,3);
+  const names = chosen.map(f => f.replace('.png','').replace(/^\d+-/,'').replace(/([A-Za-z])(\d{1,2})/,'$1 $2'));
+  const cols = [];
+  await new Promise(r => setTimeout(r, 400)); // Delay before adding cards
+  for (let i = 0; i < 3; i++) { /* Create card elements */
+    const col=document.createElement("div");col.className="card-col";const wrapper=document.createElement("div");wrapper.className="card";const inner=document.createElement("div");inner.className="card-inner";const front=document.createElement("div");front.className="card-front",front.style.backgroundImage=`url('cards/${chosen[i]}')`;const back=document.createElement("div");back.className="card-back",back.style.backgroundImage="url('cards/CardBacks.png')";inner.appendChild(front),inner.appendChild(back),wrapper.appendChild(inner),col.appendChild(wrapper);const info=document.createElement("div");info.className="card-info",info.textContent="...",col.appendChild(info),cardsDiv.appendChild(col),cols.push({col,wrapper,info})
+  }
+  cardsDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  console.log("Scrolling to cards.");
+  await new Promise(r => setTimeout(r, 100)); // Delay after scroll before card anim
+  console.log("Animating card appearance...");
+  for (let i = 0; i < cols.length; i++) {
+      await new Promise(r => setTimeout(r, 200));
+      cols[i].col.classList.add('card-appear');
+  }
+  console.log("Flipping cards and fetching interpretations...");
+  for (let i = 0; i < 3; i++) {
+      await new Promise(r=>setTimeout(r, 700));
+      cols[i].wrapper.classList.add("flipped");
+      const promptText=`\nYou are Orenda, a mystical AI tarot oracle.\nQuestion: "${q}"\nTarot card drawn: "${names[i]}"\nGive a brief poetic mystical impression about ONLY this card as related to the question, 2 short sentences max, do not use quotation marks around your answer.`;
+      try{let reply=await askOrenda(promptText,120);await typeText(reply,cols[i].info,20)}catch(e){console.error(`Error getting interpretation for ${names[i]}:`,e);cols[i].info.textContent="Silence..."}
+  }
+
+  // 7. Display Final Reading
+  console.log("Fetching final reading...");
+  await new Promise(r=>setTimeout(r, 500)); // Delay before final reading shows
+  finalReadingDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  console.log("Scrolling to final reading.");
+  await new Promise(r => setTimeout(r, 100)); // Delay after scroll before typing
+  const finalPrompt = `\nYou are Orenda, the AI tarot oracle.\nQuestion: "${q}"\nCards drawn: ${names.join(", ")}.\nGive a brief poetic closing answer synthesizing the cards' message for the question, no more than 3 sentences, do not use quotation marks around your answer.`;
+  try{let finalReply=await askOrenda(finalPrompt,200);await typeText(finalReply,finalReadingDiv,20)}catch(e){console.error("Error getting final reading:",e);finalReadingDiv.textContent="The final vision is unclear..."}
+
+  // Release Lock
+  console.log("Divination complete."); isAnimating = false; inputEl.disabled = false; // Re-enable input
+}
+
+// --- MODIFICATION: API Call Function pointing to Lambda Proxy ---
+
+// ** IMPORTANT: Replace with YOUR actual API Gateway Invoke URL + /divine route **
+const LAMBDA_PROXY_URL = 'https://cztaw5qew4.execute-api.eu-north-1.amazonaws.com/divine'; // Your provided URL + route
+
+async function askOrenda(prompttext, max_tokens = 200) {
+    // No API key check is needed here anymore
+
+    console.log("Calling Lambda proxy at:", LAMBDA_PROXY_URL); // Debug log
+
+    try {
+        // Make the API call using fetch to YOUR Lambda proxy endpoint
+        const response = await fetch(LAMBDA_PROXY_URL, {
+            method: 'POST',
+            headers: {
+                // Only need Content-Type. CORS headers are handled by API Gateway/Lambda.
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                // Send data expected by the Lambda function
+                prompttext: prompttext,
+                max_tokens: max_tokens
+            })
+        });
+
+        console.log("Lambda proxy response status:", response.status); // Debug log
+
+        // Check if the response from YOUR Lambda/API Gateway was successful
+        if (!response.ok) {
+            let errorMsg = `API Gateway/Lambda Error ${response.status}`;
+            try {
+                // Try to get detailed error message from Lambda's JSON response
+                const errData = await response.json();
+                errorMsg = errData.error || errData.message || errorMsg;
+                console.error("Error data from Lambda:", errData); // Debug log
+            } catch (parseError) {
+                 // If parsing fails (e.g., HTML error page from API Gateway), use status text
+                 const textError = await response.text(); // Get raw text
+                 console.error("Non-JSON error text from Lambda/Gateway:", textError); // Debug log
+                 errorMsg = `${errorMsg}: ${response.statusText || textError.substring(0,100)}`; // Use status text or excerpt
+            }
+            console.error("Error from Lambda Proxy:", errorMsg);
+            throw new Error(errorMsg); // Throw error to be caught by calling function
+        }
+
+        // Parse the JSON response from YOUR Lambda
+        const data = await response.json();
+        console.log("Data received from Lambda:", data); // Debug log
+
+        // Extract the reply content from the Lambda response
+        // (Matches the 'reply' field in the Lambda's successful response body)
+        const messageContent = data?.reply;
+
+        if (typeof messageContent === 'undefined') {
+            console.error("Invalid response structure from Lambda Proxy:", data);
+            throw new Error("Invalid response structure from proxy."); // Throw error
+        }
+
+        // Return the text content provided by the Lambda function
+        return messageContent; // Lambda should have trimmed it
+
+    } catch (error) {
+        // Log any network or other errors during the fetch process
+        console.error("Failed to call Lambda Proxy:", error);
+        // Re-throw the error so the calling function's catch block can handle it
+        // (e.g., display "Silence..." or "Vision is unclear..." to the user)
+        throw error; // Make sure the error propagates
+    }
+}
+</script>
+
+</body></html>
