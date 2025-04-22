@@ -1,0 +1,52 @@
+body {
+    font-family: Consolas, Monaco, 'Courier New', Courier, monospace;
+    background-color: #fff;
+    color: #000;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; /* Center vertically */
+}
+
+.container {
+    max-width: 800px;
+    text-align: center;
+}
+
+.heading {
+    opacity: 0; /* Initially hidden */
+    margin-bottom: 20px; /* Add more space between intro text and links */
+}
+
+.description {
+    opacity: 0; /* Initially hidden */
+    margin-bottom: 50px; /* Add more space between intro text and links */
+}
+
+h1, p {
+    font-size: 18px;
+    margin-bottom: 20px;
+}
+
+a {
+    display: block;
+    text-decoration: none;
+    color: #000;
+    font-size: 18px;
+    margin-bottom: 20px;
+    opacity: 0; /* Initially hidden */
+}
+
+a.visible, .heading.visible {
+    opacity: 1; /* Make visible */
+}
+
+a.visible, .description.visible {
+    opacity: 1; /* Make visible */
+}
+
+a:hover {
+    text-decoration: underline; /* Underline on hover */
+}
