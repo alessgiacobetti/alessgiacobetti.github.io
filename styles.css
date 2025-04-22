@@ -1,52 +1,75 @@
+/* Define reusable variables at the root level */
+:root {
+    --primary-font: Consolas, Monaco, 'Courier New', Courier, monospace;
+    --background-color: #fff;
+    --text-color: #000;
+    --link-hover-decoration: underline;
+    --fade-in-duration: 0.5s; /* Animation duration */
+}
+
 body {
-    font-family: Consolas, Monaco, 'Courier New', Courier, monospace;
-    background-color: #fff;
-    color: #000;
+    font-family: var(--primary-font);
+    background-color: var(--background-color);
+    color: var(--text-color);
     margin: 0;
     padding: 0;
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh; /* Center vertically */
+    min-height: 100vh; /* Use min-height for flexibility */
+    box-sizing: border-box; /* Include padding/border in element's total width/height */
 }
 
 .container {
     max-width: 800px;
+    width: 90%; /* Add some width constraint */
     text-align: center;
+    padding: 20px; /* Add some padding */
 }
 
-.heading {
+.intro-text {
+    margin-bottom: 30px; /* Adjusted spacing */
+}
+
+/* Style elements that will fade in */
+.heading,
+.description,
+.dynamic-link {
     opacity: 0; /* Initially hidden */
-    margin-bottom: 20px; /* Add more space between intro text and links */
+    /* Define transition for the opacity property */
+    transition: opacity var(--fade-in-duration) ease-in-out;
 }
 
-.description {
-    opacity: 0; /* Initially hidden */
-    margin-bottom: 50px; /* Add more space between intro text and links */
+/* Class added by JS to trigger the fade-in transition */
+.visible {
+    opacity: 1;
 }
 
-h1, p {
-    font-size: 18px;
+h1 {
+    font-size: 18px; /* Consistent font size */
+    margin-bottom: 15px; /* Adjusted spacing */
+}
+
+p {
+    font-size: 18px; /* Consistent font size */
     margin-bottom: 20px;
 }
 
-a {
+/* Style dynamically added links */
+.dynamic-link {
     display: block;
     text-decoration: none;
-    color: #000;
+    color: var(--text-color);
     font-size: 18px;
-    margin-bottom: 20px;
-    opacity: 0; /* Initially hidden */
+    margin-bottom: 20px; /* Consistent spacing */
+    cursor: pointer; /* Indicate interactivity */
 }
 
-a.visible, .heading.visible {
-    opacity: 1; /* Make visible */
+.dynamic-link:hover {
+    text-decoration: var(--link-hover-decoration); /* Underline on hover */
 }
 
-a.visible, .description.visible {
-    opacity: 1; /* Make visible */
-}
-
-a:hover {
-    text-decoration: underline; /* Underline on hover */
+/* Specific style adjustment if needed for the email link */
+.email-link {
+    /* Add specific styles if needed, otherwise inherits from .dynamic-link */
 }

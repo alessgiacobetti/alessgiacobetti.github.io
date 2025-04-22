@@ -1,77 +1,120 @@
-document.addEventListener("DOMContentLoaded", function() {
-    const links = ['LinkedIn', 'GitHub', 'Mail']; // Links in desired order
-	const container = document.getElementById('container');
+document.addEventListener('DOMContentLoaded', () => {
+    // Configuration
+    const emailAddress = "alessgiacobetti@proton.me"; //
+    const linksData = [
+        { text: 'LinkedIn', url: "https://www.linkedin.com/in/alessandrogiacobetti/", target: "_blank" }, //
+        { text: 'GitHub', url: "https://github.com/alessgiacobetti", target: "_blank" }, //
+        { text: 'Mail', url: '#', id: 'email-link' } // Special handling for Mail //
+    ];
+    const initialDelay = 500; // ms delay before first element fades in
+    const staggerDelay = 250; // ms delay between subsequent elements fading in
 
-	const heading = document.querySelector('.heading');
-	const description = document.querySelector('.description');
+    // DOM Elements
+    const container = document.getElementById('container'); //
+    const heading = document.querySelector('.heading'); //
+    const description = document.querySelector('.description'); //
 
-	setTimeout(() => {
-		heading.classList.add('visible');
-	}, 750); // Delay heading
+    // --- Function to create and append link elements ---
+    function createLinkElement(linkData, index) {
+        const link = document.createElement('a'); //
+        link.textContent = linkData.text; //
+        link.href = linkData.url; //
+        link.classList.add('dynamic-link'); // Add class for styling and transition
 
-	setTimeout(() => {
-		description.classList.add('visible');
-	}, 1250); // Delay description
-
-	
-	
-
-    links.forEach((linkText, index) => {
-        const link = document.createElement('a');
-        if (linkText === 'Mail') {
-            link.href = "#"; // Use # as href for Mail link
-            link.textContent = linkText; // Initial text is "Mail"
-            link.classList.add('email-link'); // Add a class for email links
-        } else {
-            link.href = linkText === 'LinkedIn' ? "https://www.linkedin.com/in/alessandrogiacobetti/" : "https://github.com/alessgiacobetti";
-            link.target = "_blank";
-            link.textContent = linkText;
+        if (linkData.target) {
+            link.target = linkData.target; //
         }
-        container.appendChild(link);
+        if (linkData.id === 'email-link') {
+            link.classList.add('email-link'); // Specific class for email //
+            setupEmailLinkInteraction(link); //
+        }
 
-        // Delay appearance of each link
+        container.appendChild(link); //
+
+        // Stagger the appearance of the link
         setTimeout(() => {
-            link.classList.add('visible');
-        }, (index + 3.5) * 500); // Start delay from the second link
-    });
+            link.classList.add('visible'); //
+        }, initialDelay + (index + 2) * staggerDelay); // +2 to start after heading/desc
+    }
 
-    // Add event listener to handle click events on email links
-    document.querySelectorAll('.email-link').forEach(link => {
-        let email = "alessgiacobetti@proton.me"; // Replace with your email address
-        let copiedTextTimeout;
+    // --- Function to handle email link interactions ---
+    let copiedTimeoutId = null; // Use let as it will be reassigned
 
-        link.addEventListener('click', function(event) {
-            event.preventDefault();
+    function setupEmailLinkInteraction(link) {
+        let isEmailVisible = false;
+        const originalLinkText = link.textContent; // Store the initial text "Mail"
 
-            if (link.textContent === "Mail") { // Check if the link text is "Mail"
-                link.textContent = email;
-                link.title = "Click to copy"; // Set the title attribute
+        link.addEventListener('click', (event) => {
+            event.preventDefault(); // Prevent default anchor behavior //
+
+            if (!isEmailVisible) {
+                // First click: Show email
+                link.textContent = emailAddress; //
+                isEmailVisible = true;
+                link.title = "Click to copy email"; // Set tooltip
             } else {
-                navigator.clipboard.writeText(email);
-                link.textContent = "Copied";
-                clearTimeout(copiedTextTimeout);
-                copiedTextTimeout = setTimeout(() => {
-                    link.textContent = email;
-                    link.title = ""; // Remove the title attribute
-                }, 1000);
-                setTimeout(() => {
-                    link.textContent = "Mail"; // Revert back to "Mail"
-                    link.title = "Click to show email"; // Reset the title attribute
-                }, 1000); // Adjusted timing
+                // Subsequent clicks (while email is visible): Copy email
+                navigator.clipboard.writeText(emailAddress).then(() => { //
+                    // Success feedback
+                    link.textContent = "Copied"; //
+                    link.title = ""; // Clear tooltip during "Copied"
+
+                    // Clear any existing timeout to prevent conflicts
+                    clearTimeout(copiedTimeoutId); //
+
+                    // Revert back to "Mail" after a delay
+                    copiedTimeoutId = setTimeout(() => {
+                        link.textContent = originalLinkText; // Revert to "Mail"
+                        link.title = "Click to show email"; // Reset title
+                        isEmailVisible = false; // Reset state
+                    }, 1500); // Show "Copied" for 1.5 seconds
+
+                }).catch(err => {
+                    // Basic error handling
+                    console.error("Failed to copy email: ", err);
+                    link.title = "Failed to copy. Please copy manually.";
+                    // Optionally provide visual feedback for failure - revert?
+                    // Consider reverting to email or Mail here on error
+                    // For now, just keep the email visible on error
+                    link.textContent = emailAddress; //
+                    isEmailVisible = true; // Keep state as email visible
+                });
             }
         });
 
-        // Add hover effect for "Click to copy" when email is visible
-        link.addEventListener('mouseenter', function() {
-            if (link.textContent !== "Mail") { // Check if the link text is not "Mail"
-                link.textContent = "Click to copy";
+        // Hover effects for the email link
+        link.addEventListener('mouseenter', () => {
+            // Show "Click to copy" only when the email is currently displayed
+            if (isEmailVisible && link.textContent === emailAddress) { //
+                link.textContent = "Click to copy"; //
             }
         });
 
-        link.addEventListener('mouseleave', function() {
-            if (link.textContent === "Click to copy") {
-                link.textContent = email; // Restore the original email text on mouse leave
+        link.addEventListener('mouseleave', () => {
+            // If the text is "Click to copy", revert to the email address
+            // because the mouse left before clicking to copy.
+            if (link.textContent === "Click to copy") { //
+                link.textContent = emailAddress; //
             }
+            // If the text is "Copied", the timeout will handle reverting it.
+            // If the text is the email address, leave it as is.
+            // If the text is "Mail", leave it as is.
         });
+    }
+
+    // --- Initial Setup ---
+
+    // Fade in Heading and Description first
+    setTimeout(() => {
+        heading.classList.add('visible'); //
+    }, initialDelay);
+
+    setTimeout(() => {
+        description.classList.add('visible'); //
+    }, initialDelay + staggerDelay);
+
+    // Create and fade in links
+    linksData.forEach((linkData, index) => {
+        createLinkElement(linkData, index); //
     });
 });
