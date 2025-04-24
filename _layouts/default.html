@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en" {% if page.url != '/' %}class="show-scrollbar"{% endif %}>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ page.title | default: "Alessandro Giacobetti" }}</title>
+    <link rel="stylesheet" href="/styles.css">
+    <script src="/script.js" defer></script>
+</head>
+{% comment %} Add class 'scroll-fade-active' if it's a post layout or the dispatches index {% endcomment %}
+<body {% if page.layout == 'post' or page.url == '/dispatches/' or page.url == '/dispatches/index.html' %}class="scroll-fade-active"{% endif %}>
+    <div id="page-transition-overlay"></div>
+
+    <nav class="main-nav">
+        <a href="/">Home</a>
+        <a href="/dispatches/">Dispatches</a>
+    </nav>
+
+    <main class="container page-content">
+      {{ content }}
+    </main>
+
+    {% comment %} Add the bottom fade element {% endcomment %}
+    <div class="scroll-fade-bottom"></div>
+	
+	{% comment %} Add the solid bar below the fade {% endcomment %}
+    <div class="solid-bottom-bar"></div>
+
+</body>
+</html>

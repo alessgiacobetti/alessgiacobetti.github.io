@@ -1,120 +1,174 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Configuration
-    const emailAddress = "alessgiacobetti@proton.me"; //
-    const linksData = [
-        { text: 'LinkedIn', url: "https://www.linkedin.com/in/alessandrogiacobetti/", target: "_blank" }, //
-        { text: 'GitHub', url: "https://github.com/alessgiacobetti", target: "_blank" }, //
-        { text: 'Mail', url: '#', id: 'email-link' } // Special handling for Mail //
-    ];
-    const initialDelay = 500; // ms delay before first element fades in
-    const staggerDelay = 250; // ms delay between subsequent elements fading in
 
-    // DOM Elements
-    const container = document.getElementById('container'); //
-    const heading = document.querySelector('.heading'); //
-    const description = document.querySelector('.description'); //
+    // --- Page Transition Logic ---
+    const overlay = document.getElementById('page-transition-overlay');
+    // Use CSS variable for duration, fallback to 300ms
+    const transitionDuration = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--transition-duration') || '0.3s') * 1000;
 
-    // --- Function to create and append link elements ---
-    function createLinkElement(linkData, index) {
-        const link = document.createElement('a'); //
-        link.textContent = linkData.text; //
-        link.href = linkData.url; //
-        link.classList.add('dynamic-link'); // Add class for styling and transition
-
-        if (linkData.target) {
-            link.target = linkData.target; //
+    function fadeInPage() {
+        if (overlay) {
+            overlay.classList.remove('fade-out'); // Ensure fade-out isn't stuck
+            overlay.classList.add('fade-in');    // Make overlay disappear
         }
-        if (linkData.id === 'email-link') {
-            link.classList.add('email-link'); // Specific class for email //
-            setupEmailLinkInteraction(link); //
+        // Ensure body content is visible
+        document.body.classList.remove('fade-out-content');
+        // --- Trigger Homepage Animations ---
+        // Check if we are on the homepage after the page fades in
+        const homeContainer = document.getElementById('container');
+        if (homeContainer) {
+            // Delay slightly after page transition starts
+             setTimeout(triggerHomepageAnimations, 50); // Small delay after transition starts
         }
+    }
 
-        container.appendChild(link); //
+    function fadeOutPageAndNavigate(url) {
+        if (overlay) {
+            overlay.classList.remove('fade-in'); // Prepare for fade-out
+            overlay.classList.add('fade-out');   // Make overlay appear
+        }
+        // Fade out body content
+        document.body.classList.add('fade-out-content');
 
-        // Stagger the appearance of the link
+        // Wait for the transition, then navigate
         setTimeout(() => {
-            link.classList.add('visible'); //
-        }, initialDelay + (index + 2) * staggerDelay); // +2 to start after heading/desc
+            window.location.href = url;
+        }, transitionDuration);
     }
 
-    // --- Function to handle email link interactions ---
-    let copiedTimeoutId = null; // Use let as it will be reassigned
-
-    function setupEmailLinkInteraction(link) {
-        let isEmailVisible = false;
-        const originalLinkText = link.textContent; // Store the initial text "Mail"
-
-        link.addEventListener('click', (event) => {
-            event.preventDefault(); // Prevent default anchor behavior //
-
-            if (!isEmailVisible) {
-                // First click: Show email
-                link.textContent = emailAddress; //
-                isEmailVisible = true;
-                link.title = "Click to copy email"; // Set tooltip
-            } else {
-                // Subsequent clicks (while email is visible): Copy email
-                navigator.clipboard.writeText(emailAddress).then(() => { //
-                    // Success feedback
-                    link.textContent = "Copied"; //
-                    link.title = ""; // Clear tooltip during "Copied"
-
-                    // Clear any existing timeout to prevent conflicts
-                    clearTimeout(copiedTimeoutId); //
-
-                    // Revert back to "Mail" after a delay
-                    copiedTimeoutId = setTimeout(() => {
-                        link.textContent = originalLinkText; // Revert to "Mail"
-                        link.title = "Click to show email"; // Reset title
-                        isEmailVisible = false; // Reset state
-                    }, 1500); // Show "Copied" for 1.5 seconds
-
-                }).catch(err => {
-                    // Basic error handling
-                    console.error("Failed to copy email: ", err);
-                    link.title = "Failed to copy. Please copy manually.";
-                    // Optionally provide visual feedback for failure - revert?
-                    // Consider reverting to email or Mail here on error
-                    // For now, just keep the email visible on error
-                    link.textContent = emailAddress; //
-                    isEmailVisible = true; // Keep state as email visible
-                });
-            }
-        });
-
-        // Hover effects for the email link
-        link.addEventListener('mouseenter', () => {
-            // Show "Click to copy" only when the email is currently displayed
-            if (isEmailVisible && link.textContent === emailAddress) { //
-                link.textContent = "Click to copy"; //
-            }
-        });
-
-        link.addEventListener('mouseleave', () => {
-            // If the text is "Click to copy", revert to the email address
-            // because the mouse left before clicking to copy.
-            if (link.textContent === "Click to copy") { //
-                link.textContent = emailAddress; //
-            }
-            // If the text is "Copied", the timeout will handle reverting it.
-            // If the text is the email address, leave it as is.
-            // If the text is "Mail", leave it as is.
+    // Handle clicks on internal links for fade-out effect
+    function attachLinkListeners() {
+        const internalLinks = document.querySelectorAll('a:not([href^="#"]):not([href^="mailto:"]):not([target="_blank"])');
+        internalLinks.forEach(link => {
+            // Remove existing listener to prevent duplicates if this runs multiple times
+            link.removeEventListener('click', handleLinkClick);
+            // Add the listener
+            link.addEventListener('click', handleLinkClick);
         });
     }
 
-    // --- Initial Setup ---
+    function handleLinkClick(event) {
+         const href = event.currentTarget.getAttribute('href');
+         // Basic check if it's a relative or root-relative link
+         if (href && (href.startsWith('/') || !href.includes(':'))) {
+             event.preventDefault(); // Prevent immediate navigation
+             fadeOutPageAndNavigate(href);
+         }
+    }
 
-    // Fade in Heading and Description first
-    setTimeout(() => {
-        heading.classList.add('visible'); //
-    }, initialDelay);
+    // Attach listeners initially
+    attachLinkListeners();
 
-    setTimeout(() => {
-        description.classList.add('visible'); //
-    }, initialDelay + staggerDelay);
-
-    // Create and fade in links
-    linksData.forEach((linkData, index) => {
-        createLinkElement(linkData, index); //
+    // Handle browser back/forward navigation
+    window.addEventListener('pageshow', function(event) {
+        // event.persisted is true if loaded from bfcache
+        // Always ensure the page fades in on show, especially vital for bfcache
+        fadeInPage();
     });
-});
+
+    // Initial page load fade-in
+    fadeInPage();
+    // --- End Page Transition Logic ---
+
+
+    // --- Homepage Animation Logic ---
+    function triggerHomepageAnimations() {
+        const homeContainer = document.getElementById('container');
+        // Check if the container exists (we should be on the homepage)
+        if (homeContainer) {
+            // Configuration
+            const emailAddress = "alessgiacobetti@proton.me";
+            const linksData = [
+                { text: 'LinkedIn', url: "https://www.linkedin.com/in/alessandrogiacobetti/", target: "_blank" },
+                { text: 'GitHub', url: "https://github.com/alessgiacobetti", target: "_blank" },
+                { text: 'Mail', url: '#', id: 'email-link' }
+            ];
+            const initialDelay = 100; // Reduced delay after page fade-in starts
+            const staggerDelay = 250;
+
+            // DOM Elements
+            const heading = homeContainer.querySelector('.heading');
+            const description = homeContainer.querySelector('.description');
+
+            // Function to create links (modified slightly)
+            function createLinkElement(linkData, index) {
+                const link = document.createElement('a');
+                link.textContent = linkData.text;
+                link.href = linkData.url;
+                link.classList.add('dynamic-link'); // Keep class for styling/selection
+                link.style.opacity = 0; // Start hidden for JS fade-in
+
+                if (linkData.target) {
+                    link.target = linkData.target;
+                } else if (linkData.id === 'email-link') {
+                    link.classList.add('email-link');
+                    setupEmailLinkInteraction(link);
+                } else {
+                    // It's an internal link, ensure transition listener is attached
+                    link.addEventListener('click', handleLinkClick);
+                }
+                homeContainer.appendChild(link);
+
+                // Stagger the appearance using JS transition
+                setTimeout(() => {
+                     link.style.transition = `opacity ${getComputedStyle(document.documentElement).getPropertyValue('--fade-in-duration') || '0.5s'} ease-in-out`;
+                     link.style.opacity = 1; // Fade in
+                 }, initialDelay + (index + 2) * staggerDelay);
+            }
+
+            // Function to handle email link interaction (no changes needed here)
+            let copiedTimeoutId = null;
+            function setupEmailLinkInteraction(link) {
+                 let isEmailVisible = false;
+                 const originalLinkText = link.textContent;
+                 link.addEventListener('click', (event) => {
+                     event.preventDefault();
+                     if (!isEmailVisible) {
+                         link.textContent = emailAddress;
+                         isEmailVisible = true;
+                         link.title = "Click to copy email";
+                     } else {
+                         navigator.clipboard.writeText(emailAddress).then(() => {
+                             link.textContent = "Copied";
+                             link.title = "";
+                             clearTimeout(copiedTimeoutId);
+                             copiedTimeoutId = setTimeout(() => {
+                                 link.textContent = originalLinkText;
+                                 link.title = "Click to show email";
+                                 isEmailVisible = false;
+                             }, 1500);
+                         }).catch(err => {
+                             console.error("Failed to copy email: ", err);
+                             link.title = "Failed to copy. Please copy manually.";
+                             link.textContent = emailAddress;
+                             isEmailVisible = true;
+                         });
+                     }
+                 });
+                 link.addEventListener('mouseenter', () => { if (isEmailVisible && link.textContent === emailAddress) { link.textContent = "Click to copy"; } });
+                 link.addEventListener('mouseleave', () => { if (link.textContent === "Click to copy") { link.textContent = emailAddress; } });
+            }
+
+            // Initial Setup for homepage fade-in
+            function fadeInElement(element, delay) {
+                 if (element) {
+                     element.style.opacity = 0; // Ensure starts hidden
+                     setTimeout(() => {
+                         element.style.transition = `opacity ${getComputedStyle(document.documentElement).getPropertyValue('--fade-in-duration') || '0.5s'} ease-in-out`;
+                         element.style.opacity = 1; // Fade in
+                     }, delay);
+                 }
+            }
+
+            fadeInElement(heading, initialDelay);
+            fadeInElement(description, initialDelay + staggerDelay);
+
+            // Clear existing dynamic links before creating new ones
+            homeContainer.querySelectorAll('.dynamic-link').forEach(el => el.remove());
+            linksData.forEach((linkData, index) => {
+                createLinkElement(linkData, index);
+            });
+        }
+    }
+     // --- End Homepage Animation Logic ---
+
+}); // End of DOMContentLoaded

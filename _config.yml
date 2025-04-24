@@ -1,0 +1,16 @@
+# Site settings
+title: Alessandro Giacobetti
+description: "Mechatronics MEng Student at Politecnico di Torino"
+baseurl: "" # Keep empty for user/organization pages (like username.github.io)
+url: "https://alessgiacobetti.github.io" # Your site's full URL
+
+# Build settings
+markdown: kramdown
+plugins:
+  - jekyll-feed
+
+# Excludes
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - README.md

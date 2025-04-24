@@ -1,0 +1,16 @@
+# Generated site content - GitHub Pages builds this itself
+_site/
+
+# Cache files
+.sass-cache/
+.jekyll-cache/
+.jekyll-metadata
+
+# Bundler and Ruby dependency files
+# (You installed gems locally, so ignore the vendor directory)
+vendor/bundle/
+.bundle/
+
+# OS generated files
+.DS_Store
+Thumbs.db

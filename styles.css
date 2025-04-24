@@ -5,71 +5,381 @@
     --text-color: #000;
     --link-hover-decoration: underline;
     --fade-in-duration: 0.5s; /* Animation duration */
+    --nav-height: 55px; /* Define navigation height variable */
+    --transition-duration: 0.3s; /* ADDED: Duration for page transition */
 }
+
+/* Force vertical scrollbar ONLY on pages with the .show-scrollbar class */
+/* Optional: Remove or comment out if you want fade effect always visible when scrolling */
+/*
+html.show-scrollbar {
+    overflow-y: scroll;
+}
+*/
+
 
 body {
     font-family: var(--primary-font);
     background-color: var(--background-color);
     color: var(--text-color);
     margin: 0;
-    padding: 0;
+    /* Add padding-top equal to nav height to prevent content overlap */
+    padding-top: var(--nav-height);
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    box-sizing: border-box;
+    opacity: 1; /* Ensure body is initially visible */
+    transition: opacity var(--transition-duration) ease-in-out; /* Smooth transition for body content */
+}
+
+/* ADDED: Style for when body is fading out */
+body.fade-out-content {
+    opacity: 0;
+}
+
+
+/* ++ Styles for Main Navigation ++ */
+.main-nav {
+    /* Make navigation fixed */
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    /* MODIFIED: Ensure nav is above the fade effect and page content */
+    z-index: 1001; /* Higher than .scroll-fade-bottom and .main-nav::after */
+
+    /* Appearance */
+    background-color: var(--background-color); /* Match body background */
+
+    /* Layout */
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 100vh; /* Use min-height for flexibility */
-    box-sizing: border-box; /* Include padding/border in element's total width/height */
+    width: 100%; /* Ensure it spans full width */
+    height: var(--nav-height); /* Set fixed height */
+    padding: 0;
+    box-sizing: border-box;
+    flex-shrink: 0;
+
 }
 
+.main-nav a {
+    font-family: var(--primary-font);
+    text-decoration: none;
+    color: var(--text-color);
+    margin: 0 15px;
+    font-size: 16px;
+}
+
+.main-nav a:hover {
+    text-decoration: var(--link-hover-decoration);
+}
+/* End of Main Navigation Styles */
+
+/* General Container Styles (used by Dispatches page, etc.) */
 .container {
     max-width: 800px;
-    width: 90%; /* Add some width constraint */
+    width: 90%;
+    /* Removed top margin, handled by body padding */
+    margin: 0 auto 20px auto; /* No top margin, bottom margin, auto horizontal */
+    padding: 20px;
+    box-sizing: border-box;
+    text-align: center; /* Default center alignment */
+}
+
+/* Specific Styles for Homepage Main Content (#container) */
+#container {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    max-width: 800px;
+    padding: 20px;
+    margin: 0 auto; /* Center horizontally, vertical handled by flex */
+    box-sizing: border-box;
     text-align: center;
-    padding: 20px; /* Add some padding */
 }
 
 .intro-text {
-    margin-bottom: 30px; /* Adjusted spacing */
+    margin-bottom: 30px;
 }
 
-/* Style elements that will fade in */
+/* Style elements that will fade in on homepage */
 .heading,
 .description,
 .dynamic-link {
     opacity: 0; /* Initially hidden */
-    /* Define transition for the opacity property */
     transition: opacity var(--fade-in-duration) ease-in-out;
 }
 
-/* Class added by JS to trigger the fade-in transition */
-.visible {
+.visible { /* Class for homepage fade-in */
     opacity: 1;
 }
 
+/* General heading/paragraph styles */
 h1 {
-    font-size: 18px; /* Consistent font size */
-    margin-bottom: 15px; /* Adjusted spacing */
+    font-size: 18px;
+    margin-bottom: 15px;
 }
 
 p {
-    font-size: 18px; /* Consistent font size */
+    font-size: 18px;
     margin-bottom: 20px;
 }
 
-/* Style dynamically added links */
+/* Style dynamically added links on homepage */
 .dynamic-link {
     display: block;
     text-decoration: none;
     color: var(--text-color);
     font-size: 18px;
-    margin-bottom: 20px; /* Consistent spacing */
-    cursor: pointer; /* Indicate interactivity */
+    margin-bottom: 20px;
+    cursor: pointer;
 }
 
 .dynamic-link:hover {
-    text-decoration: var(--link-hover-decoration); /* Underline on hover */
+    text-decoration: var(--link-hover-decoration);
 }
 
-/* Specific style adjustment if needed for the email link */
 .email-link {
-    /* Add specific styles if needed, otherwise inherits from .dynamic-link */
+    /* Specific styles if needed */
 }
+
+/* ++ Smaller Triangle Fold Styles (No Fade) ++ */
+.bookmark-link {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 15px;
+    height: 15px;
+    z-index: 1001; /* Ensure triangle is above nav */
+    cursor: pointer;
+}
+
+.bookmark-shape {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 0;
+    height: 0;
+    border-top: 15px solid #000;
+    border-right: 15px solid #000;
+    border-bottom: 15px solid transparent;
+    border-left: 15px solid transparent;
+    transform: scale(0);
+    transform-origin: top right;
+    transition: transform 0.2s ease-out;
+}
+
+.bookmark-link:hover .bookmark-shape {
+    transform: scale(1);
+}
+
+.bookmark-link::before {
+    content: none;
+}
+/* End of Smaller Triangle Fold Styles */
+
+
+/* ++ Styles for Dispatches List and General Page Content ++ */
+.page-content {
+   /* Set text-align for the overall content area of these pages */
+   text-align: center;
+   /* ADDED: Ensure content scrolls under fixed elements */
+   position: relative; /* Needed for z-index stacking */
+   z-index: 1; /* Lower than fade elements */
+   /* The body padding-top already handles space for the nav */
+}
+
+.blog-index {
+    /* Container specific styles if needed */
+}
+
+.post-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+	padding-top: 20px;
+}
+
+/* Default state for list items - NO fade styles */
+.post-list li {
+    margin-bottom: 40px;
+    text-align: center;
+    padding-bottom: 20px;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.post-list h2 {
+    margin-top: 0;
+    margin-bottom: 5px; /* Space below list title */
+    font-size: 22px;
+}
+
+.post-list .post-link {
+    text-decoration: none;
+    color: var(--text-color);
+}
+
+.post-list .post-link:hover {
+    text-decoration: var(--link-hover-decoration);
+}
+
+.post-list .post-meta {
+    display: block;
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 10px;
+}
+
+.post-list .post-excerpt {
+    font-size: 16px;
+    color: #333;
+}
+/* End of Dispatches List Styles */
+
+
+/* ++ Styles for Individual Post Layout (_layouts/post.html) ++ */
+.post {
+     text-align: left;
+}
+
+.post-header {
+    margin-bottom: 30px;
+    padding-bottom: 15px;
+}
+
+.post-title {
+    font-size: 22px;
+    margin-top: 0;
+    margin-bottom: 5px; /* Space below post title */
+	padding-top: 20px;
+}
+
+/* General rule for post meta */
+.post-meta {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 0; /* Default bottom margin for post meta */
+}
+
+/* Specific rule for post meta within the header to remove top margin */
+.post-header .post-meta {
+    margin-top: 0; /* <-- ADDED THIS LINE to remove potential P tag default top margin */
+}
+
+.post-content {
+    font-size: 16px;
+    line-height: 1.6;
+}
+
+.post-content h1,
+.post-content h2,
+.post-content h3,
+.post-content h4,
+.post-content h5,
+.post-content h6 {
+    margin-top: 1.5em;
+    margin-bottom: 0.5em;
+}
+
+.post-content p {
+    margin-bottom: 1em;
+    font-size: inherit;
+    overflow-wrap: break-word; /* ADDED: Allows breaking long words */
+    word-wrap: break-word; /* ADDED: Older browser compatibility */
+}
+/* End of Post Layout Styles */
+
+/* ++ Page Transition Styles - ADDED ++ */
+#page-transition-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: var(--background-color); /* Use background color variable */
+    z-index: 9999; /* High z-index to be on top */
+    opacity: 1; /* Start fully visible */
+    pointer-events: none; /* Allow clicks through when faded out */
+    transition: opacity var(--transition-duration) ease-in-out; /* Smooth fade */
+}
+
+/* Class added by JS to start the fade-out (making overlay visible) */
+#page-transition-overlay.fade-out {
+    opacity: 1;
+    pointer-events: auto; /* Block clicks during fade out */
+}
+
+/* Class added by JS to start the fade-in (making overlay disappear) */
+#page-transition-overlay.fade-in {
+    opacity: 0;
+    pointer-events: none; /* Allow clicks through */
+}
+/* End of Page Transition Styles */
+
+/* ++ Styles for Scroll Fade Effect ++ */
+
+/* Add padding to the bottom of the body on relevant pages to prevent content from being hidden by the bottom fade */
+body.scroll-fade-active {
+  padding-bottom: 60px; /* Adjust height based on .scroll-fade-bottom height */
+}
+
+/* Top fade effect using the nav's pseudo-element */
+.scroll-fade-active .main-nav::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 60px; /* Adjust fade height */
+  background: linear-gradient(to bottom, var(--background-color), transparent);
+  pointer-events: none; /* Allow clicks through */
+  transform: translateY(100%); /* Position it just below the nav */
+  z-index: 999; /* Ensure it's below the nav content but above page content */
+}
+
+/* Bottom fade element */
+.scroll-fade-bottom {
+  display: none; /* Hidden by default */
+  position: fixed;
+  bottom: 10px;
+  left: 0;
+  right: 0;
+  height: 60px; /* Adjust fade height */
+  background: linear-gradient(to top, var(--background-color), transparent);
+  pointer-events: none; /* Allow clicks/scroll through */
+  z-index: 1000; /* Ensure it's above content */
+}
+
+/* Only display the bottom fade on active pages */
+body.scroll-fade-active .scroll-fade-bottom {
+  display: block;
+}
+
+/* ++ Styles for Solid Bar Below Fade ++ */
+
+.solid-bottom-bar {
+  display: none; /* Hidden by default */
+  position: fixed;
+  bottom: 0; /* Stick to the absolute bottom */
+  left: 0;
+  right: 0;
+  height: 10px; /* The height you requested */
+  background-color: var(--background-color); /* Use the same white as your background */
+  z-index: 999; /* Below the fade (1000) but above content (1) */
+  pointer-events: none; /* Usually not needed for a bottom bar, but good practice */
+}
+
+/* Only display the solid bar on active pages (same condition as the fade) */
+body.scroll-fade-active .solid-bottom-bar {
+  display: block;
+}
+
+/* ++ End of Solid Bar Styles ++ */
+
+/* ++ End of Scroll Fade Styles ++ */

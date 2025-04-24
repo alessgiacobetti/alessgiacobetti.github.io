@@ -1,0 +1,21 @@
+---
+layout: default
+title: Dispatches
+---
+
+<div class="blog-index">
+  <ul class="post-list">
+    {% for post in site.posts %}
+      <li>
+        <h2>
+          <a class="post-link" href="{{ post.url | relative_url }}">
+            {{ post.title | escape }}
+          </a>
+        </h2>
+        <span class="post-meta">{{ post.date | date: "%B %d, %Y" }}</span>
+        </li>
+    {% else %}
+      <li>No dispatches found yet.</li>
+    {% endfor %}
+  </ul>
+</div>
