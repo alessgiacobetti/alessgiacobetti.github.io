@@ -383,3 +383,8 @@ body.scroll-fade-active .solid-bottom-bar {
 /* ++ End of Solid Bar Styles ++ */
 
 /* ++ End of Scroll Fade Styles ++ */
+
+/* Remove top padding ONLY from the homepage body */
+body:not(.scroll-fade-active) {
+    padding-top: 0;
+}
