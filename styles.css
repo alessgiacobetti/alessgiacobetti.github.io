@@ -130,6 +130,17 @@ p {
     margin-bottom: 20px;
 }
 
+/* ADDED: Specific style for links inside the description text (Leonardo link) */
+.description a {
+    color: var(--text-color);
+    text-decoration: none;
+}
+
+.description a:hover {
+    text-decoration: var(--link-hover-decoration);
+}
+
+
 /* Style dynamically added links on homepage */
 .dynamic-link {
     display: block;
