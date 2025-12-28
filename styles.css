@@ -47,9 +47,12 @@ body::before {
     left: 0;
     width: 100%;
     height: 100%;
-    pointer-events: none; /* Allows clicks to pass through */
-    z-index: 9000; /* High z-index, but below the page transition overlay */
-    opacity: 0.06; /* Adjust for more/less grain */
+    pointer-events: none;
+    /* Allows clicks to pass through */
+    z-index: 9000;
+    /* High z-index, but below the page transition overlay */
+    opacity: 0.06;
+    /* Adjust for more/less grain */
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
 }
 
@@ -65,8 +68,9 @@ body.fade-out-content {
 
 a {
     color: var(--text-color);
-    text-decoration: none; /* Remove underlines globally */
-    
+    text-decoration: none;
+    /* Remove underlines globally */
+
     /* PREPARE THE OUTLINE: 
        We set a transparent outline so the geometry exists. 
        This allows 'outline-color' to fade in smoothly. */
@@ -74,16 +78,16 @@ a {
 
     /* THE ANIMATION:
        We transition background, text color, AND outline-color simultaneously */
-    transition: background-color 0.5s ease, 
-                color 0.5s ease, 
-                outline-color 0.5s ease;
+    transition: background-color 0.5s ease,
+        color 0.5s ease,
+        outline-color 0.5s ease;
 }
 
 a:hover {
     background-color: var(--hover-bg-color);
     color: var(--hover-text-color);
     text-decoration: none;
-    
+
     /* REVEAL THE OUTLINE:
        We only change the color. The width/style comes from the base state. */
     outline-color: var(--hover-bg-color);
@@ -114,8 +118,10 @@ a:hover {
     font-family: var(--primary-font);
     margin: 0 15px;
     font-size: 16px;
-    padding: 2px 5px; /* Standard padding for hover block */
+    padding: 2px 5px;
+    /* Standard padding for hover block */
 }
+
 /* End of Main Navigation Styles */
 
 
@@ -180,23 +186,23 @@ p {
 
 /* ++ FIXED HOMEPAGE LINKS ++ */
 .dynamic-link {
-    display: inline-block; 
+    display: inline-block;
     font-size: 18px;
     margin-bottom: 20px;
     cursor: pointer;
-    
+
     /* 1. MATCHED PADDING: Matches .main-nav a exactly */
-    padding: 2px 5px; 
-    
-    border: 1px solid transparent; 
+    padding: 2px 5px;
+
+    border: 1px solid transparent;
 
     /* 2. FORCED TRANSITION: 
        We use !important to override the inline style added by script.js.
        This ensures Opacity (fade-in) AND Background/Color (hover) both work. */
     transition: opacity var(--fade-in-duration) ease-in-out,
-                background-color 0.5s ease, 
-                color 0.5s ease, 
-                outline-color 0.5s ease !important;
+        background-color 0.5s ease,
+        color 0.5s ease,
+        outline-color 0.5s ease !important;
 }
 
 /* ++ Smaller Triangle Fold Styles (Exception) ++ */
@@ -216,6 +222,7 @@ p {
     background-color: transparent !important;
     outline: none !important;
 }
+
 /* End Bookmark Exception */
 
 .bookmark-shape {
@@ -240,25 +247,23 @@ p {
 .bookmark-link::before {
     content: none;
 }
+
 /* End of Smaller Triangle Fold Styles */
 
 
 /* ++ Styles for Dispatches List and General Page Content ++ */
 .page-content {
-   text-align: center;
-   position: relative;
-   z-index: 1;
+    text-align: center;
+    position: relative;
+    z-index: 1;
 }
 
-.blog-index {
-    /* Container specific styles if needed */
-}
 
 .post-list {
     list-style: none;
     padding: 0;
     margin: 0;
-    padding-top: 20px;
+    padding-top: 30px;
 }
 
 .post-list li {
@@ -277,7 +282,7 @@ p {
 
 .post-list .post-link {
     padding: 2px 5px;
-    display: inline-block; 
+    display: inline-block;
 }
 
 .post-list .post-meta {
@@ -291,12 +296,13 @@ p {
     font-size: 16px;
     color: #333;
 }
+
 /* End of Dispatches List Styles */
 
 
 /* ++ Styles for Individual Post Layout (_layouts/post.html) ++ */
 .post {
-     text-align: left;
+    text-align: left;
 }
 
 .post-header {
@@ -342,6 +348,7 @@ p {
     overflow-wrap: break-word;
     word-wrap: break-word;
 }
+
 /* End of Post Layout Styles */
 
 /* ++ Page Transition Styles ++ */
@@ -371,53 +378,53 @@ p {
 /* ++ Styles for Scroll Fade Effect ++ */
 
 body.scroll-fade-active {
-  padding-bottom: 60px;
+    padding-bottom: 60px;
 }
 
 .scroll-fade-active .main-nav::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 60px;
-  background: linear-gradient(to bottom, var(--background-color), transparent);
-  pointer-events: none;
-  transform: translateY(100%);
-  z-index: 999;
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 60px;
+    background: linear-gradient(to bottom, var(--background-color), transparent);
+    pointer-events: none;
+    transform: translateY(100%);
+    z-index: 999;
 }
 
 .scroll-fade-bottom {
-  display: none;
-  position: fixed;
-  bottom: 10px;
-  left: 0;
-  right: 0;
-  height: 60px;
-  background: linear-gradient(to top, var(--background-color), transparent);
-  pointer-events: none;
-  z-index: 1000;
+    display: none;
+    position: fixed;
+    bottom: 10px;
+    left: 0;
+    right: 0;
+    height: 60px;
+    background: linear-gradient(to top, var(--background-color), transparent);
+    pointer-events: none;
+    z-index: 1000;
 }
 
 body.scroll-fade-active .scroll-fade-bottom {
-  display: block;
+    display: block;
 }
 
 /* ++ Styles for Solid Bar Below Fade ++ */
 .solid-bottom-bar {
-  display: none;
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 10px;
-  background-color: var(--background-color);
-  z-index: 999;
-  pointer-events: none;
+    display: none;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 10px;
+    background-color: var(--background-color);
+    z-index: 999;
+    pointer-events: none;
 }
 
 body.scroll-fade-active .solid-bottom-bar {
-  display: block;
+    display: block;
 }
 
 /* Remove top padding ONLY from the homepage body */
