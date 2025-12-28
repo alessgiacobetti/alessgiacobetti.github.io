@@ -436,12 +436,10 @@ body:not(.scroll-fade-active) {
 }
 
 /* ++ Fighter Jet Animation ++ */
-/* ++ Fighter Jet Animation ++ */
 .fighter-jet-animation {
     position: fixed;
     bottom: 15%;
     left: -300px;
-    /* Start off-screen Left */
     width: 150px;
     height: auto;
     z-index: 10;
@@ -459,20 +457,5 @@ body:not(.scroll-fade-active) {
     100% {
         transform: translateX(calc(100vw + 400px)) scaleX(-1);
         /* Move across screen + width */
-    }
-}
-
-/* Phase 4: Exit to Left */
-@keyframes exit-jet {
-    0% {
-        /* Start: Bottom Center */
-        transform: translate(0px, 450px) rotate(190deg) scaleY(-1);
-        opacity: 1;
-    }
-
-    100% {
-        /* End: Far Left */
-        transform: translate(-100vw, 450px) rotate(190deg) scaleY(-1);
-        opacity: 1;
     }
 }
