@@ -143,6 +143,9 @@ a:hover {
     justify-content: center;
     align-items: center;
     width: 100%;
+    /* Ensure text stays above the jet */
+    position: relative;
+    z-index: 20;
     max-width: 800px;
     padding: 20px;
     margin: 0 auto;
@@ -430,4 +433,46 @@ body.scroll-fade-active .solid-bottom-bar {
 /* Remove top padding ONLY from the homepage body */
 body:not(.scroll-fade-active) {
     padding-top: 0;
+}
+
+/* ++ Fighter Jet Animation ++ */
+/* ++ Fighter Jet Animation ++ */
+.fighter-jet-animation {
+    position: fixed;
+    bottom: 15%;
+    left: -300px;
+    /* Start off-screen Left */
+    width: 150px;
+    height: auto;
+    z-index: 10;
+    pointer-events: none;
+
+    /* Simple Linear Flight: Left to Right */
+    animation: flyLeftToRight 10s linear 1 forwards;
+}
+
+@keyframes flyLeftToRight {
+    0% {
+        transform: translateX(0) scaleX(-1);
+    }
+
+    100% {
+        transform: translateX(calc(100vw + 400px)) scaleX(-1);
+        /* Move across screen + width */
+    }
+}
+
+/* Phase 4: Exit to Left */
+@keyframes exit-jet {
+    0% {
+        /* Start: Bottom Center */
+        transform: translate(0px, 450px) rotate(190deg) scaleY(-1);
+        opacity: 1;
+    }
+
+    100% {
+        /* End: Far Left */
+        transform: translate(-100vw, 450px) rotate(190deg) scaleY(-1);
+        opacity: 1;
+    }
 }
