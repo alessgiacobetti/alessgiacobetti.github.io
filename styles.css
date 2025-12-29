@@ -1,5 +1,4 @@
-/* 1. Import IBM Plex Mono for the "Engineer" aesthetic */
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+/* 1. Font is now loaded in HTML for better performance */
 
 /* Define reusable variables at the root level */
 :root {
@@ -18,12 +17,10 @@
     --transition-duration: 0.5s;
 }
 
-/* Force vertical scrollbar ONLY on pages with the .show-scrollbar class */
-/*
-html.show-scrollbar {
-    overflow-y: scroll;
+/* GLOBAL RESET: Ensures padding doesn't break layout width */
+*, *::before, *::after {
+    box-sizing: border-box;
 }
-*/
 
 body {
     font-family: var(--primary-font);
@@ -34,7 +31,6 @@ body {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
-    box-sizing: border-box;
     opacity: 1;
     transition: opacity var(--transition-duration) ease-in-out;
 }
@@ -48,11 +44,8 @@ body::before {
     width: 100%;
     height: 100%;
     pointer-events: none;
-    /* Allows clicks to pass through */
     z-index: 9000;
-    /* High z-index, but below the page transition overlay */
     opacity: 0.06;
-    /* Adjust for more/less grain */
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
 }
 
@@ -72,24 +65,21 @@ a {
     /* Remove underlines globally */
 
     /* PREPARE THE OUTLINE: 
-       We set a transparent outline so the geometry exists. 
-       This allows 'outline-color' to fade in smoothly. */
+       We set a transparent outline so the geometry exists. */
     outline: 2px solid transparent;
 
-    /* THE ANIMATION:
-       We transition background, text color, AND outline-color simultaneously */
+    /* THE ANIMATION */
     transition: background-color 0.5s ease,
         color 0.5s ease,
         outline-color 0.5s ease;
 }
 
-a:hover {
+/* Combined Hover and Keyboard Focus state */
+a:hover,
+a:focus-visible {
     background-color: var(--hover-bg-color);
     color: var(--hover-text-color);
     text-decoration: none;
-
-    /* REVEAL THE OUTLINE:
-       We only change the color. The width/style comes from the base state. */
     outline-color: var(--hover-bg-color);
 }
 
@@ -110,7 +100,6 @@ a:hover {
     width: 100%;
     height: var(--nav-height);
     padding: 0;
-    box-sizing: border-box;
     flex-shrink: 0;
 }
 
@@ -119,7 +108,6 @@ a:hover {
     margin: 0 15px;
     font-size: 16px;
     padding: 2px 5px;
-    /* Standard padding for hover block */
 }
 
 /* End of Main Navigation Styles */
@@ -131,7 +119,6 @@ a:hover {
     width: 90%;
     margin: 0 auto 20px auto;
     padding: 20px;
-    box-sizing: border-box;
     text-align: center;
 }
 
@@ -146,7 +133,6 @@ a:hover {
     max-width: 800px;
     padding: 20px;
     margin: 0 auto;
-    box-sizing: border-box;
     text-align: center;
 }
 
@@ -190,15 +176,10 @@ p {
     font-size: 18px;
     margin-bottom: 20px;
     cursor: pointer;
-
-    /* 1. MATCHED PADDING: Matches .main-nav a exactly */
     padding: 2px 5px;
-
     border: 1px solid transparent;
 
-    /* 2. FORCED TRANSITION: 
-       We use !important to override the inline style added by script.js.
-       This ensures Opacity (fade-in) AND Background/Color (hover) both work. */
+    /* 2. FORCED TRANSITION */
     transition: opacity var(--fade-in-duration) ease-in-out,
         background-color 0.5s ease,
         color 0.5s ease,
@@ -214,7 +195,6 @@ p {
     height: 15px;
     z-index: 1001;
     cursor: pointer;
-    /* Override global link styles for this graphic element */
     outline: none !important;
 }
 
