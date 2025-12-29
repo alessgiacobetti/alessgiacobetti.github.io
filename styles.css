@@ -154,13 +154,13 @@ a:focus-visible {
 
 /* General heading/paragraph styles */
 h1 {
-    font-size: 26px; /* Increased from 18px */
+    font-size: 22px; /* Increased from 18px */
     margin-bottom: 15px;
     font-weight: 600;
 }
 
 h2 {
-    font-size: 22px; /* Distinctly smaller than H1 */
+    font-size: 20px; /* Distinctly smaller than H1 */
     margin-bottom: 15px;
     font-weight: 600;
 }
